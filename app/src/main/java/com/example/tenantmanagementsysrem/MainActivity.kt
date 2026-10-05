@@ -18,20 +18,35 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val email = intent.getStringExtra("EMAIL")
+
+        if (email != null) {
+            Toast.makeText(
+                this,
+                "Logged in as $email",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
         binding.saveButton.setOnClickListener {
 
             val name = binding.tenantNameEditText.text.toString()
             val phone = binding.phoneEditText.text.toString()
             val rent = binding.rentEditText.text.toString()
 
+            if (name.isEmpty()) {
+                binding.tenantNameEditText.error = "Required"
+            }
+
+            if (phone.isEmpty()) {
+                binding.phoneEditText.error = "Required"
+            }
+
+            if (rent.isEmpty()) {
+                binding.rentEditText.error = "Required"
+            }
+
             if (name.isEmpty() || phone.isEmpty() || rent.isEmpty()) {
-
-                Toast.makeText(
-                    this,
-                    "Please fill in all fields",
-                    Toast.LENGTH_SHORT
-                ).show()
-
                 return@setOnClickListener
             }
 
@@ -70,6 +85,28 @@ class MainActivity : AppCompatActivity() {
             )
 
             startActivity(intent)
+        }
+
+        binding.shareButton.setOnClickListener {
+
+            val tenant = lastTenant
+
+            if (tenant == null) {
+
+                Toast.makeText(
+                    this,
+                    "Save a tenant first",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                return@setOnClickListener
+            }
+
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "text/plain"
+            intent.putExtra(Intent.EXTRA_TEXT, tenant.summary())
+
+            startActivity(Intent.createChooser(intent, "Share tenant details"))
         }
     }
 }
